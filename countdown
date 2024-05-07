@@ -1,0 +1,35 @@
+#! /usr/bin/python3
+
+import time
+import os
+import argparse
+import subprocess
+
+def countdown(t, message):
+    pid = os.fork()
+    if pid == 0:
+        time.sleep(t)
+        subprocess.check_output(["osascript -e 'display alert \"Countdown\" message \"%s\"'"%message], shell=True)
+    return
+
+parser = argparse.ArgumentParser(description='Countdown timer')
+
+parser.add_argument('-H', '--hours', type=int, default=0, help='Hours')
+parser.add_argument('-M', '--minutes', type=int, default=0, help='Minutes')
+parser.add_argument('-S', '--seconds', type=int, default=0, help='Seconds')
+parser.add_argument('-m', '--message', type=str, default="Time is up!", help='Message to display when time is up')
+
+args = parser.parse_args()
+
+t = args.hours*3600 + args.minutes*60 + args.seconds
+
+print("Countdown started for %d hours, %d minutes and %d seconds."%(args.hours, args.minutes, args.seconds))
+
+current_time = time.strftime("%H:%M:%S", time.localtime())
+
+# Add the time to the current time
+end_time = time.strftime("%H:%M:%S", time.localtime(time.time() + t))
+
+print("Countdown will end at %s."%end_time)
+
+countdown(t, args.message)
